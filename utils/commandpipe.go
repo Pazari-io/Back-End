@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"errors"
+	"log"
 	"os/exec"
 	"time"
 )
@@ -18,7 +19,7 @@ func ExecuteCommand(command string, timeOut time.Duration, args ...string) (stri
 	// This time we can simply use Output() to get the result.
 	out, err := cmd.Output()
 
-	//	log.Println(cmd)
+	log.Println(cmd)
 
 	if ctx.Err() == context.DeadlineExceeded {
 		//log.Println("Command timed out")

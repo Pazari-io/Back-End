@@ -11,16 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// get audio duriation
-// ffprobe -i Audio_Sample.mp3  -show_entries format=duration -v quiet -of csv="p=0"
-
-// get audio BPM
-// aubio tempo Audio_Sample.mp3
-
-// Watermark audio
-//ffmpeg -i main.mp3 -filter_complex "amovie=beep.wav:loop=0,asetpts=N/SR/TB,adelay=10s:all=1[beep]; [0][beep]amix=duration=shortest,volume=2"   out.mp3
-//ffmpeg -i main.mp3 '-filter_complex', '[0:a]volume=volume=1[aout0];[1:a]volume=volume=2[aout1];[aout1]aloop=loop=-1:size=2e+09,adelay=2000,atrim=start=0:end=2:duration=6[aconcat];[aout0][aconcat]amix=inputs=2:duration=longest:dropout_transition=4 [aout]',
-
 func ProcessAudio(fileName string, db *gorm.DB) error {
 
 	// get these from config
@@ -66,7 +56,7 @@ func ProcessAudio(fileName string, db *gorm.DB) error {
 	durantionStr := strconv.Itoa(duration)
 	extention := filepath.Ext(fileName)
 	waterMarkedFileName := utils.ShaHash() + extention
-	args = []string{"-i", fileName, "-stream_loop", "-1", "-i", waterMarkAudio, "-filter_complex", "[1:a][0:a]amix", "-t", durantionStr, "-ar", "48000", "-f", "mp3", "-y", "./uploads/watermarked/" + waterMarkedFileName}
+	args = []string{"-i", fileName, "-stream_loop", "-1", "-i", waterMarkAudio, "-filter_complex", "[1:a][0:a]amix", "-t", durantionStr, "-ar", "48000", "-f", "mp3", "-y", "uploads/watermarked/" + waterMarkedFileName}
 	waterMarkAudio, err = utils.ExecuteCommand(ffmpegPath, 600, args...)
 
 	if err != nil {

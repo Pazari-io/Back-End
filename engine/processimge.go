@@ -14,7 +14,7 @@ func ProcessImage(fileName string, db *gorm.DB) error {
 
 	// get em from config later
 	var magickPath = "/usr/local/bin/magick"
-	var waterMarkImage = "./data/pazari-full.png"
+	var waterMarkImage = "data/pazari-full.png"
 
 	// Step I: get image height and width
 
@@ -42,7 +42,7 @@ func ProcessImage(fileName string, db *gorm.DB) error {
 	measureString := strconv.Itoa(halfWeight) + "x" + strconv.Itoa(halfHeight)
 
 	// Step II: resize the watermarked image with half of the original size
-	args = []string{"convert", waterMarkImage, "-resize", measureString, "./uploads/watermarks/" + waterResizedFileName}
+	args = []string{"convert", waterMarkImage, "-resize", measureString, "uploads/watermarks/" + waterResizedFileName}
 	_, err = utils.ExecuteCommand(magickPath, 360, args...)
 
 	if err != nil {
@@ -50,7 +50,7 @@ func ProcessImage(fileName string, db *gorm.DB) error {
 	}
 
 	// Step III: do the watermark
-	args = []string{"composite", "-dissolve", "15%", "-gravity", "SouthWest", "./uploads/watermarks/" + waterResizedFileName, fileName, "./uploads/watermarked/" + waterMarkedFileName}
+	args = []string{"composite", "-dissolve", "15%", "-gravity", "SouthWest", "uploads/watermarks/" + waterResizedFileName, fileName, "uploads/watermarked/" + waterMarkedFileName}
 	_, err = utils.ExecuteCommand(magickPath, 360, args...)
 
 	if err != nil {

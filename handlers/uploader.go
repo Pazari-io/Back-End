@@ -20,7 +20,7 @@ keep a huge chunk of extention out for first version
 var AudioExtentions = []string{"mp3", "wav"}
 var ImageExtentions = []string{"jpg", "png", "jpeg", "psd", "gif", "bmp", "tiff", "webp", "heic", "svg"}
 var VideoExtentions = []string{"mp4", "mpg", "mpeg", "avi", "mkv", "webm", "m4v", "mov", "wmv"}
-var EbookExtentions = []string{"epub", "mobi", "pdf"}
+var EbookExtentions = []string{"pdf"} // "epub", "mobi",
 
 // game assts / graphics have to be archive now
 var ArchiveExtentions = []string{"zip", "rar", "7z"}
@@ -93,6 +93,34 @@ func Uploader(c *fiber.Ctx) error {
 				c.SendStatus(fiber.StatusInternalServerError)
 			}
 			go engine.ProcessAudio(filePath, database.DBInstance)
+
+			b64ID := base64.StdEncoding.EncodeToString([]byte(fileID))
+
+			return c.JSON(fiber.Map{"taskID": b64ID})
+		}
+
+	case "video":
+		{
+			task.Type = "video"
+			fileID, err := models.CreateTaskRecord(task, database.DBInstance)
+			if err != nil {
+				c.SendStatus(fiber.StatusInternalServerError)
+			}
+			go engine.ProcessVideo(filePath, database.DBInstance)
+
+			b64ID := base64.StdEncoding.EncodeToString([]byte(fileID))
+
+			return c.JSON(fiber.Map{"taskID": b64ID})
+		}
+
+	case "ebook":
+		{
+			task.Type = "ebook"
+			fileID, err := models.CreateTaskRecord(task, database.DBInstance)
+			if err != nil {
+				c.SendStatus(fiber.StatusInternalServerError)
+			}
+			go engine.ProcessEbook(filePath, database.DBInstance)
 
 			b64ID := base64.StdEncoding.EncodeToString([]byte(fileID))
 
