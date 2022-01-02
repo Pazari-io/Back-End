@@ -10,11 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
-// globals
-var magickPath = "/usr/local/bin/magick"
-var waterMarkImage = "./data/pazari-full.png"
-
 func ProcessImage(fileName string, db *gorm.DB) error {
+
+	// get em from config later
+	var magickPath = "/usr/local/bin/magick"
+	var waterMarkImage = "./data/pazari-full.png"
 
 	// Step I: get image height and width
 

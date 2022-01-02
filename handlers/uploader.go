@@ -85,6 +85,19 @@ func Uploader(c *fiber.Ctx) error {
 			return c.JSON(fiber.Map{"taskID": b64ID})
 
 		}
+	case "audio":
+		{
+			task.Type = "audio"
+			fileID, err := models.CreateTaskRecord(task, database.DBInstance)
+			if err != nil {
+				c.SendStatus(fiber.StatusInternalServerError)
+			}
+			go engine.ProcessAudio(filePath, database.DBInstance)
+
+			b64ID := base64.StdEncoding.EncodeToString([]byte(fileID))
+
+			return c.JSON(fiber.Map{"taskID": b64ID})
+		}
 
 	default:
 		c.SendStatus(fiber.StatusBadRequest)

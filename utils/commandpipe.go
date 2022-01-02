@@ -7,10 +7,6 @@ import (
 	"time"
 )
 
-// func WaterMarkPDF(file string,permissions bool) {
-// return nill
-// }
-
 func ExecuteCommand(command string, timeOut time.Duration, args ...string) (string, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeOut*time.Second)
@@ -22,6 +18,8 @@ func ExecuteCommand(command string, timeOut time.Duration, args ...string) (stri
 	// This time we can simply use Output() to get the result.
 	out, err := cmd.Output()
 
+	//	log.Println(cmd)
+
 	if ctx.Err() == context.DeadlineExceeded {
 		//log.Println("Command timed out")
 		return "", errors.New("command timed out")
@@ -32,8 +30,6 @@ func ExecuteCommand(command string, timeOut time.Duration, args ...string) (stri
 		return "", err
 
 	}
-
-	//log.Println(string(out))
 
 	// If there's no context error, we know the command completed (or errored).
 	return string(out), nil
