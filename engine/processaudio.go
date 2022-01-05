@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"log"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -11,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func ProcessAudio(fileName string, db *gorm.DB) error {
+func ProcessAudio(fileName string, db *gorm.DB, errChannel chan error) {
 
 	// get these from config
 	var aubioPath = "/usr/local/bin/aubio"
@@ -28,10 +27,9 @@ func ProcessAudio(fileName string, db *gorm.DB) error {
 	b, _ := strconv.ParseFloat(getAudioDuration, 32)
 	duration := int(b)
 
-	log.Println(duration)
-
 	if err != nil {
-		return err
+		errChannel <- err
+
 	}
 
 	args = []string{"tempo", fileName}
@@ -41,10 +39,10 @@ func ProcessAudio(fileName string, db *gorm.DB) error {
 	g, _ := strconv.ParseFloat(d[0], 32)
 	bpm := int(g)
 
-	log.Println(bpm)
+	//log.Println(bpm)
 
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
 	// for this version we use a 7 seconds pazari loop might need more adjustments
@@ -57,13 +55,13 @@ func ProcessAudio(fileName string, db *gorm.DB) error {
 	extention := filepath.Ext(fileName)
 	waterMarkedFileName := utils.ShaHash() + extention
 	args = []string{"-i", fileName, "-stream_loop", "-1", "-i", waterMarkAudio, "-filter_complex", "[1:a][0:a]amix", "-t", durantionStr, "-ar", "48000", "-f", "mp3", "-y", "uploads/watermarked/" + waterMarkedFileName}
-	waterMarkAudio, err = utils.ExecuteCommand(ffmpegPath, 600, args...)
+	_, err = utils.ExecuteCommand(ffmpegPath, 600, args...)
 
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
-	log.Println(waterMarkAudio)
+	//log.Println(waterMarkAudio)
 
 	// Step III: update the database
 	var results models.Results
@@ -75,9 +73,9 @@ func ProcessAudio(fileName string, db *gorm.DB) error {
 
 	err = models.UpdateTaskResults(fileName, results, db)
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
-	return nil
+	errChannel <- nil
 
 }

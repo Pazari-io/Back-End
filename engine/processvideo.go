@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"log"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -11,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func ProcessVideo(fileName string, db *gorm.DB) error {
+func ProcessVideo(fileName string, db *gorm.DB, errChannel chan error) {
 
 	// Step I: get Video height and width
 
@@ -33,7 +32,7 @@ func ProcessVideo(fileName string, db *gorm.DB) error {
 	weight := measures[0]
 	height := measures[1]
 
-	log.Println(measures)
+	//log.Println(measures)
 	halfHeight, _ := strconv.Atoi(height)
 	halfHeight = halfHeight / 2
 	halfWeight, _ := strconv.Atoi(weight)
@@ -41,10 +40,10 @@ func ProcessVideo(fileName string, db *gorm.DB) error {
 
 	measureString := strconv.Itoa(halfWeight) + "x" + strconv.Itoa(halfHeight)
 
-	log.Println(measureString)
+	//log.Println(measureString)
 
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
 	extention := filepath.Ext(fileName)
@@ -56,7 +55,7 @@ func ProcessVideo(fileName string, db *gorm.DB) error {
 	_, err = utils.ExecuteCommand(magickPath, 360, args...)
 
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
 	// Step III: do the watermark
@@ -65,7 +64,7 @@ func ProcessVideo(fileName string, db *gorm.DB) error {
 	_, err = utils.ExecuteCommand(ffmpegPath, 600, args...)
 
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
 	// Step IV: update the database
@@ -77,8 +76,9 @@ func ProcessVideo(fileName string, db *gorm.DB) error {
 
 	err = models.UpdateTaskResults(fileName, results, db)
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
-	return nil
+	errChannel <- nil
+
 }

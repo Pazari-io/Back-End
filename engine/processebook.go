@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func ProcessEbook(fileName string, db *gorm.DB) error {
+func ProcessEbook(fileName string, db *gorm.DB, errChannel chan error) {
 
 	// get em from config later
 	pdfCpuPath := "/Users/mac/go/bin/pdfcpu"
@@ -24,7 +24,7 @@ func ProcessEbook(fileName string, db *gorm.DB) error {
 	_, err := utils.ExecuteCommand(pdfCpuPath, 360, args...)
 
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
 	// Step II: encrypt the pdf
@@ -37,7 +37,7 @@ func ProcessEbook(fileName string, db *gorm.DB) error {
 	_, err = utils.ExecuteCommand(pdfCpuPath, 360, args...)
 
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 	// Step III: update the database
 
@@ -54,8 +54,8 @@ func ProcessEbook(fileName string, db *gorm.DB) error {
 
 	err = models.UpdateTaskResults(fileName, results, db)
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
-	return nil
+	errChannel <- nil
 }

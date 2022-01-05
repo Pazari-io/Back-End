@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func ProcessImage(fileName string, db *gorm.DB) error {
+func ProcessImage(fileName string, db *gorm.DB, errChannel chan error) {
 
 	// get em from config later
 	var magickPath = "/usr/local/bin/magick"
@@ -23,7 +23,7 @@ func ProcessImage(fileName string, db *gorm.DB) error {
 	getImageSize, err := utils.ExecuteCommand(magickPath, 360, args...)
 
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
 	// Get half of the image width and height
@@ -46,7 +46,7 @@ func ProcessImage(fileName string, db *gorm.DB) error {
 	_, err = utils.ExecuteCommand(magickPath, 360, args...)
 
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
 	// Step III: do the watermark
@@ -54,7 +54,7 @@ func ProcessImage(fileName string, db *gorm.DB) error {
 	_, err = utils.ExecuteCommand(magickPath, 360, args...)
 
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
 	// Step IV: update the database
@@ -66,9 +66,9 @@ func ProcessImage(fileName string, db *gorm.DB) error {
 
 	err = models.UpdateTaskResults(fileName, results, db)
 	if err != nil {
-		return err
+		errChannel <- err
 	}
 
-	return nil
+	errChannel <- nil
 
 }

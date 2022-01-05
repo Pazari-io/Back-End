@@ -21,9 +21,8 @@ var AudioExtentions = []string{"mp3", "wav"}
 var ImageExtentions = []string{"jpg", "png", "jpeg", "psd", "gif", "bmp", "tiff", "webp", "heic", "svg"}
 var VideoExtentions = []string{"mp4", "mpg", "mpeg", "avi", "mkv", "webm", "m4v", "mov", "wmv"}
 var EbookExtentions = []string{"pdf"} // "epub", "mobi",
-
 // game assts / graphics have to be archive now
-var ArchiveExtentions = []string{"zip", "rar", "7z"}
+var ArchiveExtentions = []string{"zip"} // "rar", "7z"
 
 // might need a multiple file uploader later
 func Uploader(c *fiber.Ctx) error {
@@ -42,15 +41,15 @@ func Uploader(c *fiber.Ctx) error {
 
 	fileType := "unknown"
 
-	if inSlice(extention, ArchiveExtentions) {
+	if utils.InSlice(extention, ArchiveExtentions) {
 		fileType = "archive"
-	} else if inSlice(extention, AudioExtentions) {
+	} else if utils.InSlice(extention, AudioExtentions) {
 		fileType = "audio"
-	} else if inSlice(extention, ImageExtentions) {
+	} else if utils.InSlice(extention, ImageExtentions) {
 		fileType = "image"
-	} else if inSlice(extention, VideoExtentions) {
+	} else if utils.InSlice(extention, VideoExtentions) {
 		fileType = "video"
-	} else if inSlice(extention, EbookExtentions) {
+	} else if utils.InSlice(extention, EbookExtentions) {
 		fileType = "ebook"
 	} else {
 		fileType = "unknown"
@@ -78,7 +77,13 @@ func Uploader(c *fiber.Ctx) error {
 			if err != nil {
 				c.SendStatus(fiber.StatusInternalServerError)
 			}
-			go engine.ProcessImage(filePath, database.DBInstance)
+			errChannel := make(chan error, 1)
+
+			go engine.ProcessImage(filePath, database.DBInstance, errChannel)
+
+			if (<-errChannel) != nil {
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
 
 			b64ID := base64.StdEncoding.EncodeToString([]byte(fileID))
 
@@ -92,7 +97,11 @@ func Uploader(c *fiber.Ctx) error {
 			if err != nil {
 				c.SendStatus(fiber.StatusInternalServerError)
 			}
-			go engine.ProcessAudio(filePath, database.DBInstance)
+			errChannel := make(chan error, 1)
+			go engine.ProcessAudio(filePath, database.DBInstance, errChannel)
+			if (<-errChannel) != nil {
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
 
 			b64ID := base64.StdEncoding.EncodeToString([]byte(fileID))
 
@@ -106,7 +115,11 @@ func Uploader(c *fiber.Ctx) error {
 			if err != nil {
 				c.SendStatus(fiber.StatusInternalServerError)
 			}
-			go engine.ProcessVideo(filePath, database.DBInstance)
+			errChannel := make(chan error, 1)
+			go engine.ProcessVideo(filePath, database.DBInstance, errChannel)
+			if (<-errChannel) != nil {
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
 
 			b64ID := base64.StdEncoding.EncodeToString([]byte(fileID))
 
@@ -120,7 +133,31 @@ func Uploader(c *fiber.Ctx) error {
 			if err != nil {
 				c.SendStatus(fiber.StatusInternalServerError)
 			}
-			go engine.ProcessEbook(filePath, database.DBInstance)
+			errChannel := make(chan error, 1)
+
+			go engine.ProcessEbook(filePath, database.DBInstance, errChannel)
+
+			if (<-errChannel) != nil {
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
+
+			b64ID := base64.StdEncoding.EncodeToString([]byte(fileID))
+
+			return c.JSON(fiber.Map{"taskID": b64ID})
+		}
+
+	case "archive":
+		{
+			task.Type = "archive"
+			fileID, err := models.CreateTaskRecord(task, database.DBInstance)
+			if err != nil {
+				c.SendStatus(fiber.StatusInternalServerError)
+			}
+			errChannel := make(chan error, 1)
+			go engine.ProcessArchive(filePath, database.DBInstance, errChannel)
+			if (<-errChannel) != nil {
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
 
 			b64ID := base64.StdEncoding.EncodeToString([]byte(fileID))
 
@@ -134,13 +171,4 @@ func Uploader(c *fiber.Ctx) error {
 	return c.SendString("K")
 	//return c.SendStatus(fiber.StatusBadRequest)
 
-}
-
-func inSlice(s string, sl []string) bool {
-	for _, v := range sl {
-		if v == s {
-			return true
-		}
-	}
-	return false
 }

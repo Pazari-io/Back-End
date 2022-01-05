@@ -8,14 +8,15 @@ import (
 )
 
 type Results struct {
-	WaterMaked         string `json:"watermaked"`
-	Measurements       string `json:"measurements"`
-	Extention          string `json:"extention"`
-	Duration           string `json:"duration"`
-	BPM                string `json:"bpm"`
-	Encrypted          string `json:"encrypted"` // for PDF and Archive
-	UserEncryptionKey  string `json:"userencryptionkey"`
-	OwnerEncryptionKey string `json:"ownerencryptionkey"`
+	WaterMaked         string   `json:"watermaked"`
+	Measurements       string   `json:"measurements"`
+	Extention          string   `json:"extention"`
+	Duration           string   `json:"duration"`
+	BPM                string   `json:"bpm"`
+	Encrypted          string   `json:"encrypted"` // for PDF and Archive
+	UserEncryptionKey  string   `json:"userencryptionkey"`
+	OwnerEncryptionKey string   `json:"ownerencryptionkey"`
+	ZipFileList        []string `json:"zipfilelist"`
 }
 
 type Task struct {
