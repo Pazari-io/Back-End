@@ -87,13 +87,6 @@ Currently alpha and under development .
 
 
 
-# Welcome to Pazari Engine
-
-
-
-This repository holds the current version of our backend engine, which helps us protect and distribute digital publications. 
-
-
 
 ## Purpose
 
