@@ -3,3 +3,4 @@
 *.db
 uploads/**
 ./main
+./api
