@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/Pazari-io/Back-End/database"
+	"github.com/Pazari-io/Back-End/internal"
 	"github.com/Pazari-io/Back-End/routes"
 	"github.com/gofiber/fiber/v2"
 )
@@ -12,5 +13,5 @@ func main() {
 	app := fiber.New()
 
 	routes.InitRoutes(app)
-	app.Listen(":1337")
+	app.Listen(":" + internal.GetKey("PORT"))
 }
