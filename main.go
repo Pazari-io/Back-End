@@ -7,15 +7,10 @@ import (
 )
 
 func main() {
-
-	//output, _ := helpers.ExecuteCommand("ls", 3, "-la")
-
-	//log.Println(output)
-
+	// initalize everything
 	database.InitDB()
-
 	app := fiber.New()
-	routes.InitRoutes(app)
 
+	routes.InitRoutes(app)
 	app.Listen(":1337")
 }

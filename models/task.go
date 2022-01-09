@@ -47,6 +47,26 @@ func CheckStatusByName(file string, db *gorm.DB) (string, error) {
 	return "", result.Error
 }
 
+func GetOrignalFile(file string, db *gorm.DB) (string, error) {
+
+	var task Task
+	result := db.First(&task, "File = ?", file)
+	if result.RowsAffected > 0 {
+		return task.File, nil
+	}
+	return "", result.Error
+}
+
+func CheckTypeByName(file string, db *gorm.DB) (string, error) {
+
+	var task Task
+	result := db.First(&task, "File = ?", file)
+	if result.RowsAffected > 0 {
+		return task.Type, nil
+	}
+	return "", result.Error
+}
+
 func GetWaterMarked(file string, db *gorm.DB) (Task, error) {
 
 	var task Task

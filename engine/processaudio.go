@@ -5,23 +5,23 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Pazari-io/Back-End/internal"
 	"github.com/Pazari-io/Back-End/models"
-	"github.com/Pazari-io/Back-End/utils"
 	"gorm.io/gorm"
 )
 
 func ProcessAudio(fileName string, db *gorm.DB, errChannel chan error) {
 
 	// get these from config
-	var aubioPath = "/usr/local/bin/aubio"
-	var waterMarkAudio = "data/pazari_watermark_loop.mp3"
-	var ffprobePath = "/usr/local/bin/ffprobe"
-	var ffmpegPath = "/usr/local/bin/ffmpeg"
+	var aubioPath = internal.GetKey("AUBIO_PATH")
+	var waterMarkAudio = internal.GetKey("WATER_MARK_AUDIO")
+	var ffprobePath = internal.GetKey("FFPROBE_PATH")
+	var ffmpegPath = internal.GetKey("FFMPEG_PATH")
 
 	// Step I: get audio information (duration, BPM)
 
 	args := []string{"-i", fileName, "-show_entries", "format=duration", "-v", "quiet", "-of", "csv=p=0"}
-	getAudioDuration, err := utils.ExecuteCommand(ffprobePath, 360, args...)
+	getAudioDuration, err := internal.ExecuteCommand(ffprobePath, 360, args...)
 
 	getAudioDuration = strings.TrimSpace(getAudioDuration)
 	b, _ := strconv.ParseFloat(getAudioDuration, 32)
@@ -33,7 +33,7 @@ func ProcessAudio(fileName string, db *gorm.DB, errChannel chan error) {
 	}
 
 	args = []string{"tempo", fileName}
-	getAudioBPM, err := utils.ExecuteCommand(aubioPath, 360, args...)
+	getAudioBPM, err := internal.ExecuteCommand(aubioPath, 360, args...)
 
 	d := strings.Split(getAudioBPM, " ")
 	g, _ := strconv.ParseFloat(d[0], 32)
@@ -53,9 +53,9 @@ func ProcessAudio(fileName string, db *gorm.DB, errChannel chan error) {
 
 	durantionStr := strconv.Itoa(duration)
 	extention := filepath.Ext(fileName)
-	waterMarkedFileName := utils.ShaHash() + extention
+	waterMarkedFileName := internal.ShaHash() + extention
 	args = []string{"-i", fileName, "-stream_loop", "-1", "-i", waterMarkAudio, "-filter_complex", "[1:a][0:a]amix", "-t", durantionStr, "-ar", "48000", "-f", "mp3", "-y", "uploads/watermarked/" + waterMarkedFileName}
-	_, err = utils.ExecuteCommand(ffmpegPath, 600, args...)
+	_, err = internal.ExecuteCommand(ffmpegPath, 600, args...)
 
 	if err != nil {
 		errChannel <- err

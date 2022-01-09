@@ -5,22 +5,22 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Pazari-io/Back-End/internal"
 	"github.com/Pazari-io/Back-End/models"
-	"github.com/Pazari-io/Back-End/utils"
 	"gorm.io/gorm"
 )
 
 func ProcessImage(fileName string, db *gorm.DB, errChannel chan error) {
 
 	// get em from config later
-	var magickPath = "/usr/local/bin/magick"
-	var waterMarkImage = "data/pazari-full.png"
+	var magickPath = internal.GetKey("MAGICK_PATH")
+	var waterMarkImage = internal.GetKey("WATER_MARK_IMAGE")
 
 	// Step I: get image height and width
 
 	extention := filepath.Ext(fileName)
 	args := []string{"identify", "-ping", "-format", "%w:%h", fileName}
-	getImageSize, err := utils.ExecuteCommand(magickPath, 360, args...)
+	getImageSize, err := internal.ExecuteCommand(magickPath, 360, args...)
 
 	if err != nil {
 		errChannel <- err
@@ -36,14 +36,14 @@ func ProcessImage(fileName string, db *gorm.DB, errChannel chan error) {
 	halfWeight = halfWeight / 2
 
 	// two more files
-	waterResizedFileName := utils.ShaHash() + extention
-	waterMarkedFileName := utils.ShaHash() + extention
+	waterResizedFileName := internal.ShaHash() + extention
+	waterMarkedFileName := internal.ShaHash() + extention
 
 	measureString := strconv.Itoa(halfWeight) + "x" + strconv.Itoa(halfHeight)
 
 	// Step II: resize the watermarked image with half of the original size
 	args = []string{"convert", waterMarkImage, "-resize", measureString, "uploads/watermarks/" + waterResizedFileName}
-	_, err = utils.ExecuteCommand(magickPath, 360, args...)
+	_, err = internal.ExecuteCommand(magickPath, 360, args...)
 
 	if err != nil {
 		errChannel <- err
@@ -51,7 +51,7 @@ func ProcessImage(fileName string, db *gorm.DB, errChannel chan error) {
 
 	// Step III: do the watermark
 	args = []string{"composite", "-dissolve", "15%", "-gravity", "SouthWest", "uploads/watermarks/" + waterResizedFileName, fileName, "uploads/watermarked/" + waterMarkedFileName}
-	_, err = utils.ExecuteCommand(magickPath, 360, args...)
+	_, err = internal.ExecuteCommand(magickPath, 360, args...)
 
 	if err != nil {
 		errChannel <- err

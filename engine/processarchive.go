@@ -8,15 +8,15 @@ import (
 	// "strconv"
 	// "strings"
 
+	"github.com/Pazari-io/Back-End/internal"
 	"github.com/Pazari-io/Back-End/models"
-	"github.com/Pazari-io/Back-End/utils"
 	"gorm.io/gorm"
 )
 
 func ProcessArchive(fileName string, db *gorm.DB, errChannel chan error) {
 
 	// get these from config
-	var SevenZipPath = "/usr/local/bin/7z"
+	var SevenZipPath = internal.GetKey("SEVEN_ZIP_PATH")
 
 	// Step I: get files in zip
 	files, err := getFilesInZip(fileName)
@@ -25,10 +25,10 @@ func ProcessArchive(fileName string, db *gorm.DB, errChannel chan error) {
 	}
 
 	// Step II: extract filees to a temp directory
-	RandomHash := utils.ShaHash()
+	RandomHash := internal.ShaHash()
 	outPutDir := "-ouploads/temp/" + RandomHash + "/"
 	args := []string{"x", fileName, outPutDir}
-	_, err = utils.ExecuteCommand(SevenZipPath, 360, args...)
+	_, err = internal.ExecuteCommand(SevenZipPath, 360, args...)
 
 	if err != nil {
 		errChannel <- err
@@ -36,13 +36,13 @@ func ProcessArchive(fileName string, db *gorm.DB, errChannel chan error) {
 
 	// that . is to not create folders
 	outPutDirR := "./uploads/temp/" + RandomHash + "/"
-	RandomPass := utils.ShaHash()
+	RandomPass := internal.ShaHash()
 	extention := filepath.Ext(fileName)
-	encryptedFileName := "./uploads/encrypted/" + utils.ShaHash() + ".7z"
+	encryptedFileName := "./uploads/encrypted/" + internal.ShaHash() + ".7z"
 
 	// // Step III: encrypt temp files and create new file
 	args = []string{"a", "-t7z", "-m0=lzma2", "-mx=9", "-mfb=64", "-md=32m", "-ms=on", "-mhe=on", "-p" + RandomPass, encryptedFileName, "-r", outPutDirR + "*"}
-	_, err = utils.ExecuteCommand(SevenZipPath, 360, args...)
+	_, err = internal.ExecuteCommand(SevenZipPath, 360, args...)
 
 	//Step IV: delete temp files
 	os.RemoveAll(outPutDirR)

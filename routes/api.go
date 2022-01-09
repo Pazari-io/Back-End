@@ -24,5 +24,6 @@ func InitRoutes(app fiber.Router) {
 	authAPI := baseAPI.Group("/auth", middlewares.KeyProtected())
 	authAPI.Post("/upload", handlers.Uploader)
 	authAPI.Get("/watermark", handlers.DownloadWaterMarked)
+	authAPI.Get("/download", handlers.DownloadPurchased)
 
 }

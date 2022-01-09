@@ -6,8 +6,8 @@ import (
 
 	"github.com/Pazari-io/Back-End/database"
 	"github.com/Pazari-io/Back-End/engine"
+	"github.com/Pazari-io/Back-End/internal"
 	"github.com/Pazari-io/Back-End/models"
-	"github.com/Pazari-io/Back-End/utils"
 
 	"encoding/base64"
 
@@ -41,15 +41,15 @@ func Uploader(c *fiber.Ctx) error {
 
 	fileType := "unknown"
 
-	if utils.InSlice(extention, ArchiveExtentions) {
+	if internal.InSlice(extention, ArchiveExtentions) {
 		fileType = "archive"
-	} else if utils.InSlice(extention, AudioExtentions) {
+	} else if internal.InSlice(extention, AudioExtentions) {
 		fileType = "audio"
-	} else if utils.InSlice(extention, ImageExtentions) {
+	} else if internal.InSlice(extention, ImageExtentions) {
 		fileType = "image"
-	} else if utils.InSlice(extention, VideoExtentions) {
+	} else if internal.InSlice(extention, VideoExtentions) {
 		fileType = "video"
-	} else if utils.InSlice(extention, EbookExtentions) {
+	} else if internal.InSlice(extention, EbookExtentions) {
 		fileType = "ebook"
 	} else {
 		fileType = "unknown"
@@ -60,7 +60,7 @@ func Uploader(c *fiber.Ctx) error {
 	}
 
 	// secure file name to avoid name collision url leakage
-	fileName := utils.ShaHash()
+	fileName := internal.ShaHash()
 	filePath := "./uploads/original/" + fileName + "." + extention
 
 	c.SaveFile(file, filePath)
