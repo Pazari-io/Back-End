@@ -1,5 +1,5 @@
 .DS_Store
 ./idea
 *.db
-Upload/
+**/upload/*
 ./main
