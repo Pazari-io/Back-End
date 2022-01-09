@@ -79,10 +79,6 @@ To download the watermarked edition (works for audio, video, and images) for sho
 On success downloads the original or encrypted (for example, PDF). This should only be shared with the buyer after the smart contract confirms and verifies the transaction.
 
 
-## Important
-
-Currently alpha and under development .
-
 
 ### Depencensies
 
