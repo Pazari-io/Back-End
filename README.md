@@ -52,7 +52,7 @@ Because the Pazari engine requires careful configuration, Dockerfile containeriz
 
 ```bash
 docker build -t pazari-engine .
-docker run -d -p 1337:1337 -it pazari-engine:latest
+docker run -d -p 1337:1337 -it pazari-engine:latest # development 
 docker run -d -p 443:443 -it pazari-engine:latest # production
 ```
 
