@@ -24,10 +24,10 @@ func main() {
 		// Certificate manager
 		m := &autocert.Manager{
 			Prompt: autocert.AcceptTOS,
-			// Replace with your domain
-			HostPolicy: autocert.HostWhitelist("api.pazari.io"),
+
+			HostPolicy: autocert.HostWhitelist("engine.pazari.io"),
 			// Folder to store the certificates
-			Cache: autocert.DirCache("./certs"),
+			Cache: autocert.DirCache("/cert-cache"),
 		}
 
 		// TLS Config

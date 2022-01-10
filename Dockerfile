@@ -41,8 +41,16 @@ RUN curl "https://pazari-storage.sgp1.digitaloceanspaces.com/pdfcpu_0.3.13_Linux
 
 COPY ./data ./data
 COPY ./uploads ./uploads
+#COPY ./certs   ./cert-cache
+
+#DEV
+#COPY ./.env ./.env
 COPY ./.env.prod ./.env
-   
-    
-EXPOSE 1337
+#DEV   
+#EXPOSE 1337    
+
+#Production
+VOLUME ["/app/cert-cache"]
+
+EXPOSE 443
 CMD ["./api"]

@@ -52,8 +52,10 @@ Because the Pazari engine requires careful configuration, Dockerfile containeriz
 
 ```bash
 docker build -t pazari-engine .
-docker run -d -p 1337:1337 -it pazari-engine:latest # development 
-docker run -d -p 443:443 -it pazari-engine:latest # production
+# development 
+docker run -d -p 1337:1337 pazari-engine:latest 
+# production (need to cache certificate on host and restart after crashes )
+docker run -d -p 443:443 --restart=always -v certs:/certs pazari-engine:latest 
 ```
 
 ## API
