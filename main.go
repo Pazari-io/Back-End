@@ -16,6 +16,9 @@ func main() {
 	database.InitDB()
 	app := fiber.New()
 
+	// set up routes
+	routes.InitRoutes(app)
+
 	if internal.GetKey("PRODUCTION") == "true" {
 
 		// Certificate manager
@@ -44,7 +47,5 @@ func main() {
 
 	}
 
-	// set up routes
-	routes.InitRoutes(app)
 	app.Listen("0.0.0.0:" + internal.GetKey("PORT"))
 }
