@@ -9,7 +9,7 @@ import (
 func InitRoutes(app fiber.Router) {
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hi 👋!")
+		return c.SendString("Hi 👋! Pazari-Engine is running! 1.0.0-alpha.4")
 	})
 
 	// health check
