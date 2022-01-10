@@ -1,7 +1,11 @@
 .DS_Store
 ./idea
 *.db
-uploads/**
+uploads/encrypted/*
+uploads/original/*
+uploads/temp/*
+uploads/watermarked/*
+uploads/watermarks/*
 ./main
 ./api
 .env.prod
