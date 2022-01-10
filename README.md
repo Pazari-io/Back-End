@@ -45,7 +45,16 @@ An API server written in Go . Which handles
     go test ./...
     ```
 
- 
+## Docker container 
+
+Because the Pazari engine requires careful configuration, Dockerfile containerizes the whole dependencies on Debian bullseye.
+
+
+```bash
+docker build -t pazari-engine .
+docker run -d -p 1337:1337 -it pazari-engine:latest
+docker run -d -p 443:443 -it pazari-engine:latest # production
+```
 
 ## API
 
