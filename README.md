@@ -94,6 +94,8 @@ Our engine uses well-known open-source software to handle encryption, authorizat
 
 [Aubio](https://github.com/aubio/aubio)
 
+[Pdfcpu](https://github.com/pdfcpu/pdfcpu)
+
 
 
 ## Security

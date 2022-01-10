@@ -16,7 +16,8 @@ func ProcessVideo(fileName string, db *gorm.DB, errChannel chan error) {
 
 	var ffprobePath = internal.GetKey("FFPROBE_PATH")
 	var ffmpegPath = internal.GetKey("FFMPEG_PATH")
-	var magickPath = internal.GetKey("MAGICK_PATH")
+	//var magickPath = internal.GetKey("MAGICK_PATH")
+	var convertPath = internal.GetKey("CONVERT_PATH")
 
 	var waterMarkImage = internal.GetKey("WATER_MARK_IMAGE_VIDEO")
 
@@ -51,8 +52,8 @@ func ProcessVideo(fileName string, db *gorm.DB, errChannel chan error) {
 	waterMarkedFileName := internal.ShaHash() + extention
 
 	// Step II: resize the watermarked image with half of the original size
-	args = []string{"convert", waterMarkImage, "-resize", measureString, "uploads/watermarks/" + waterResizedFileName}
-	_, err = internal.ExecuteCommand(magickPath, 360, args...)
+	args = []string{waterMarkImage, "-resize", measureString, "uploads/watermarks/" + waterResizedFileName}
+	_, err = internal.ExecuteCommand(convertPath, 360, args...)
 
 	if err != nil {
 		errChannel <- err

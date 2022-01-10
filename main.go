@@ -13,5 +13,5 @@ func main() {
 	app := fiber.New()
 
 	routes.InitRoutes(app)
-	app.Listen(":" + internal.GetKey("PORT"))
+	app.Listen("0.0.0.0:" + internal.GetKey("PORT"))
 }

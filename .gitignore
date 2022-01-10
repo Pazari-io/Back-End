@@ -4,3 +4,4 @@
 uploads/**
 ./main
 ./api
+.env.prod

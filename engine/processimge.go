@@ -13,14 +13,17 @@ import (
 func ProcessImage(fileName string, db *gorm.DB, errChannel chan error) {
 
 	// get em from config later
-	var magickPath = internal.GetKey("MAGICK_PATH")
+	//var magickPath = internal.GetKey("MAGICK_PATH")
+	var convertPath = internal.GetKey("CONVERT_PATH")
+	var compositePath = internal.GetKey("COMPOSITE_PATH")
+	var identifyPath = internal.GetKey("IDENTIFY_PATH")
 	var waterMarkImage = internal.GetKey("WATER_MARK_IMAGE")
 
 	// Step I: get image height and width
 
 	extention := filepath.Ext(fileName)
-	args := []string{"identify", "-ping", "-format", "%w:%h", fileName}
-	getImageSize, err := internal.ExecuteCommand(magickPath, 360, args...)
+	args := []string{"-ping", "-format", "%w:%h", fileName}
+	getImageSize, err := internal.ExecuteCommand(identifyPath, 360, args...)
 
 	if err != nil {
 		errChannel <- err
@@ -42,16 +45,16 @@ func ProcessImage(fileName string, db *gorm.DB, errChannel chan error) {
 	measureString := strconv.Itoa(halfWeight) + "x" + strconv.Itoa(halfHeight)
 
 	// Step II: resize the watermarked image with half of the original size
-	args = []string{"convert", waterMarkImage, "-resize", measureString, "uploads/watermarks/" + waterResizedFileName}
-	_, err = internal.ExecuteCommand(magickPath, 360, args...)
+	args = []string{waterMarkImage, "-resize", measureString, "uploads/watermarks/" + waterResizedFileName}
+	_, err = internal.ExecuteCommand(convertPath, 360, args...)
 
 	if err != nil {
 		errChannel <- err
 	}
 
 	// Step III: do the watermark
-	args = []string{"composite", "-dissolve", "15%", "-gravity", "SouthWest", "uploads/watermarks/" + waterResizedFileName, fileName, "uploads/watermarked/" + waterMarkedFileName}
-	_, err = internal.ExecuteCommand(magickPath, 360, args...)
+	args = []string{"-dissolve", "15%", "-gravity", "SouthWest", "uploads/watermarks/" + waterResizedFileName, fileName, "uploads/watermarked/" + waterMarkedFileName}
+	_, err = internal.ExecuteCommand(compositePath, 360, args...)
 
 	if err != nil {
 		errChannel <- err

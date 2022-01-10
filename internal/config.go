@@ -16,7 +16,7 @@ func GetKey(key string) string {
 	// load .env file so it's accessible from GetEnv
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
 	return os.Getenv(key)
 	//}
