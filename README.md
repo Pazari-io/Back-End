@@ -55,7 +55,7 @@ docker build -t pazari-engine .
 # development 
 docker run -d -p 1337:1337 pazari-engine:latest 
 # production (need to cache certificate on host and restart after crashes )
-docker run -d -p 443:443 --restart=always -v certs:/certs pazari-engine:latest 
+docker run -d -p 443:443 --restart=always -v cert-cache:/app/cert-cache pazari-engine:latest 
 ```
 
 ## API

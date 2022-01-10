@@ -27,7 +27,7 @@ func main() {
 
 			HostPolicy: autocert.HostWhitelist("engine.pazari.io"),
 			// Folder to store the certificates
-			Cache: autocert.DirCache("/cert-cache"),
+			Cache: autocert.DirCache("./cert-cache"),
 		}
 
 		// TLS Config
