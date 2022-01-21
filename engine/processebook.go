@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/Pazari-io/Back-End/internal"
@@ -42,7 +41,7 @@ func ProcessEbook(fileName string, db *gorm.DB, errChannel chan error) {
 	// Step III: update the database
 
 	// Delete the unecrypted watermarked file
-	os.Remove("uploads/watermarked/" + waterMarkedFileName)
+	// os.Remove("uploads/watermarked/" + waterMarkedFileName)
 
 	var results models.Results
 

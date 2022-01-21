@@ -47,5 +47,5 @@ func main() {
 
 	}
 
-	app.Listen("0.0.0.0:" + internal.GetKey("PORT"))
+	log.Fatal(app.Listen("0.0.0.0:" + internal.GetKey("PORT")))
 }

@@ -27,23 +27,58 @@ func DownloadPurchased(c *fiber.Ctx) error {
 		status, err := models.CheckStatusByName(fileName, database.DBInstance)
 		if err != nil {
 			return c.SendStatus(fiber.StatusBadRequest)
-
 		}
 
-		original, err := models.GetOrignalFile(fileName, database.DBInstance)
+		taskType, err := models.CheckTypeByName(fileName, database.DBInstance)
 		if err != nil {
 			return c.SendStatus(fiber.StatusBadRequest)
 
 		}
 
-		// might need to add some license files and archive it
-		if status == "done" {
-			return c.Download(original)
+		if taskType == "archive" || taskType == "ebook" {
 
+			encryptedFileName, err := models.GetTaskByName(fileName, database.DBInstance)
+			if err != nil {
+				return c.SendStatus(fiber.StatusBadRequest)
+
+			}
+
+			var res models.Results
+			err = json.Unmarshal(encryptedFileName.Results, &res)
+
+			if err != nil {
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
+
+			encrypted := "uploads/encrypted/" + res.Encrypted
+			//decryptionKey := "uploads/encrypted/" + res.UserEncryptionKey
+
+			// might need to add some license files and archive it
+			if status == "done" {
+				return c.Download(encrypted)
+
+			}
+		}
+
+		if taskType == "audio" || taskType == "image" || taskType == "video" {
+
+			original, err := models.GetOrignalFile(fileName, database.DBInstance)
+			if err != nil {
+				return c.SendStatus(fiber.StatusBadRequest)
+
+			}
+
+			// might need to add some license files and archive it
+			if status == "done" {
+				return c.Download(original)
+
+			}
 		}
 
 	}
+
 	return nil
+
 }
 
 func DownloadWaterMarked(c *fiber.Ctx) error {
@@ -61,9 +96,6 @@ func DownloadWaterMarked(c *fiber.Ctx) error {
 			return c.SendStatus(fiber.StatusBadRequest)
 
 		}
-		if !(taskType == "audio" || taskType == "image" || taskType == "video") {
-			return c.SendStatus(fiber.StatusBadRequest)
-		}
 
 		status, err := models.CheckStatusByName(fileName, database.DBInstance)
 		if err != nil {
@@ -71,23 +103,51 @@ func DownloadWaterMarked(c *fiber.Ctx) error {
 
 		}
 
-		waterMarkedFile, err := models.GetWaterMarked(fileName, database.DBInstance)
-		if err != nil {
-			return c.SendStatus(fiber.StatusBadRequest)
+		if taskType == "audio" || taskType == "image" || taskType == "video" || taskType == "ebook" {
 
+			waterMarkedFile, err := models.GetTaskByName(fileName, database.DBInstance)
+			if err != nil {
+				return c.SendStatus(fiber.StatusBadRequest)
+
+			}
+
+			var res models.Results
+			err = json.Unmarshal(waterMarkedFile.Results, &res)
+
+			if err != nil {
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
+			watermarked := "uploads/watermarked/" + res.WaterMaked
+
+			if status == "done" {
+				return c.Download(watermarked)
+
+			}
 		}
 
-		var res models.Results
-		err = json.Unmarshal(waterMarkedFile.Results, &res)
+		if taskType == "archive" {
 
-		if err != nil {
-			return c.SendStatus(fiber.StatusInternalServerError)
-		}
-		watermarked := "uploads/watermarked/" + res.WaterMaked
+			encryptedFileName, err := models.GetTaskByName(fileName, database.DBInstance)
+			if err != nil {
+				return c.SendStatus(fiber.StatusBadRequest)
 
-		if status == "done" {
-			return c.Download(watermarked)
+			}
 
+			var res models.Results
+			err = json.Unmarshal(encryptedFileName.Results, &res)
+
+			if err != nil {
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
+
+			encrypted := res.Encrypted
+			//decryptionKey := "uploads/encrypted/" + res.UserEncryptionKey
+			//log.Println(encrypted)
+			// might need to add some license files and archive it
+			if status == "done" {
+				return c.Download(encrypted)
+
+			}
 		}
 
 	}

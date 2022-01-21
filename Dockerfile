@@ -38,6 +38,9 @@ RUN curl "https://pazari-storage.sgp1.digitaloceanspaces.com/pdfcpu_0.3.13_Linux
     && cp pdfcpu /usr/bin/pdfcpu\
     && cd ..\
     && rm -rf pdfcpu
+    
+# ulimit
+RUN ulimit -n 2048
 
 COPY ./data ./data
 COPY ./uploads ./uploads

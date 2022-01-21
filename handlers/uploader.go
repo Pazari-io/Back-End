@@ -31,13 +31,11 @@ func Uploader(c *fiber.Ctx) error {
 	file, err := c.FormFile("file")
 
 	if err != nil {
-		c.SendStatus(fiber.StatusBadRequest)
+		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	// extract and validate extention
 	extention := strings.Replace(filepath.Ext(file.Filename), ".", "", -1)
-
-	//log.Println(noDotExtention)
 
 	fileType := "unknown"
 
@@ -168,7 +166,5 @@ func Uploader(c *fiber.Ctx) error {
 		c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	return c.SendString("K")
-	//return c.SendStatus(fiber.StatusBadRequest)
-
+	return nil
 }

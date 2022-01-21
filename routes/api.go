@@ -25,5 +25,6 @@ func InitRoutes(app fiber.Router) {
 	authAPI.Post("/upload", handlers.Uploader)
 	authAPI.Get("/watermark", handlers.DownloadWaterMarked)
 	authAPI.Get("/download", handlers.DownloadPurchased)
+	authAPI.Get("/task", handlers.TaskStatus)
 
 }
